@@ -1,7 +1,7 @@
 import inspect
 from functools import reduce
 from types import TracebackType
-from typing import Callable, Optional, Collection
+from typing import Callable, Optional, Sequence
 
 import hunter
 from hunter import Q, Event, config
@@ -56,13 +56,13 @@ class ExceptionHandlerAction(ColorStreamAction):
 def enable_exception_tracing(
         exc_handler: Optional[BaseExceptionHandler] = None,
         stdlib: bool = False,
-        module: Optional[str | Collection[str]] = None,
+        module: Optional[str | Sequence[str]] = None,
 ) -> None:
     predicate = Q(stdlib=stdlib) & Q(kind="exception")
     if module:
         if isinstance(module, str) and module:
             predicate &= Q(module=module)
-        elif isinstance(module, Collection) and len(module) > 0:
+        elif isinstance(module, Sequence) and len(module) > 0:
             qs = [Q(module=mod) for mod in module]
             predicate &= reduce(lambda lhs, rhs: lhs | rhs, qs)
     hunter.trace(predicate,
