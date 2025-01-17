@@ -1,6 +1,8 @@
 import inspect
+import logging
 import traceback
 from logging import Logger
+from typing import Optional
 
 from exctypes import ExceptionInfo
 
@@ -24,12 +26,14 @@ class LoggingExceptionHandler(BaseExceptionHandler):
     This handler simply logs all exceptions, together with position, function name, args, and full stacktrace.
     """
 
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger, level: Optional[int] = logging.WARNING):
         super().__init__()
         self.logger = logger
+        self.level = level
 
     def __call__(self, excinfo: ExceptionInfo):
-        self.logger.warning(
+        self.logger.log(
+            self.level,
             f"{excinfo.filename}:{excinfo.lineno} {excinfo.func_name}{inspect.formatargvalues(*excinfo.func_args)}",
             exc_info=(type(excinfo.exc), excinfo.exc , excinfo.tb)
         )
